@@ -1,4 +1,5 @@
 import React from 'react';
+import { useMemo } from "react";
 //styles
 // import "./TopExpenseBody.css";
 //hooks
@@ -15,18 +16,18 @@ const TopExpenseBody = () => {
         ]);
     
     //functions
-    const showSortedData = () => {
-        // console.log(chartData.sort((a,b) => b.value - a.value))
-        return chartData.sort((a,b) => b.value - a.value);
-        
-    }
+   
 
-    console.log(showSortedData())
+const sortedData = useMemo(() => {
+  return [...chartData].sort((a, b) => b.value - a.value);
+}, [chartData]);
+
+    
     
     return (
-        <div className='TopExpensesBody'  onClick={showSortedData}>
+        <div className='TopExpensesBody'  >
             <ResponsiveContainer  >
-                <BarChart data={showSortedData()} layout="vertical" barSize={30}>
+            <BarChart data={sortedData} layout="vertical" barSize={30}>
                     <XAxis type='number' hide/>
                     <YAxis type="category" width={120} dataKey="name"/>
                     <Bar dataKey="value" fill="#8784D2" />
