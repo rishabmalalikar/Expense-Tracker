@@ -1,69 +1,69 @@
-import { useState,useRef,useEffect } from 'react'
-import './App.css'
-import Navbar from 'components/navbar'
-import AppHead from 'components/AppHead'
-import AppBody from 'components/appBody'
-import {transationContext,moneyContext} from 'context/allcontext'
-import {dummyData} from './dummyteansation'
-// import Header from './header'
-// import Body from './body'
-// import { useForkRef } from '@mui/material'
+import { useEffect, useRef, useState } from 'react'
+//styles
+import './App.css';
+//components
+import Navbar from './component/Navbar/Navbar'
+import AppHead from './component/AppHead/AppHead'
+import AppBody from './component/AppBody/AppBody';
+//contexts
+import { TransactionsContext, MoneyContext } from "./context/allcontext"
+//variables
+import { dummyData } from './dummyTransactions';
 
 const defaultMoney = {
   balance: 5000,
-  expenses: dummyData.reduce((total, transaction) => total + Number(transaction.amount), 0)
+  expenses: dummyData.reduce((total, transaction) => total + Number(transaction.price), 0)
 }
 
 function App() {
   const [money, setMoney] = useState(defaultMoney)
-  const [transactionData, setTransactionData] = useState(dummyData)
-  const initialRender = useRef(true)
+  const [transactionData, setTransactionData] = useState(dummyData);
+  const initialRender = useRef(true);
 
-  useEffect(() => {
+  useEffect(()=>{
     if(initialRender.current) {
-      onload() 
-      return (()=>{initialRender.current = false})
+      onLoad();
+      initialRender.current = false;
     }
   }, [])
 
-  useEffect(() => {
+  useEffect(()=> {
+    // save data to local storage after initial load
     if(!initialRender.current) {
-      localStorage.setItem("all Data", JSON.stringify({money, transactionData}))
-      localStorage.setItem("expenses", JSON.stringify(transactionData))
+      localStorage.setItem("allData", JSON.stringify({money, transactionData}));
+      localStorage.setItem("expenses", JSON.stringify(transactionData));
     }
   }, [money, transactionData])
 
-    const onload = () => {
-      const storedData = localStorage.getItem("all Data") || localStorage.getItem("expenses")
-      if(storedData) {
-        const {money, transactionData} = JSON.parse(storedData)
-        if(parsedData && parsedData.money && parsedData.transactionData) {
-          setMoney(money)
-          setTransactionData(transactionData)
-        }else if(Array.isArray(parsedData)) {
-          const expensesTotal = parsedData.reduce((total, transaction) => total + Number(transaction.price), 0)
-          setMoney({balance: defaultMoney.balance, expenses: expensesTotal})
-          setTransactionData(parsedData)
-        }
+  //functions
+  const onLoad = () => {
+    //load data from local storage if present
+    const storedData = localStorage.getItem("allData") || localStorage.getItem("expenses");
+    if(storedData){
+      const parsedData = JSON.parse(storedData);
+      if(parsedData && parsedData.money && parsedData.transactionData){
+        setMoney(parsedData.money);
+        setTransactionData(parsedData.transactionData);
+      } else if(Array.isArray(parsedData)){
+        const expensesTotal = parsedData.reduce((total, transaction) => total + Number(transaction.price), 0);
+        setMoney({ balance: defaultMoney.balance, expenses: expensesTotal });
+        setTransactionData(parsedData);
       }
     }
+  }
+  
 
   return (
-  <>
     <main className='App'>
-      <moneyContext.Provider value={{money, setMoney}}>
-        <transationContext.Provider value={{transactionData, setTransactionData}}>
-          <Navbar/>
-          <AppHead balance={money.balance} expenses={money.expenses}/>
-          <AppBody transactionData={transactionData}/>
-        </transationContext.Provider>
-      </moneyContext.Provider>
+      <MoneyContext.Provider value={[money, setMoney]}>
+      <TransactionsContext.Provider value={[transactionData, setTransactionData]}>
+        <Navbar />
+        <AppHead balance={money.balance} expenses={money.expenses}/>
+        <AppBody transactionData={transactionData}/>
+      </TransactionsContext.Provider> 
+      </MoneyContext.Provider>
     </main>
-  </>
   )
 }
 
 export default App
-
-
-// https://github.com/nishchayjainit20-a11y/xpense-tracker

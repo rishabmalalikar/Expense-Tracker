@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
-export const moneyContext = React.createContext();
-export const transationContext = React.createContext();
+export const TransactionsContext = React.createContext();
+export const MoneyContext = React.createContext();
